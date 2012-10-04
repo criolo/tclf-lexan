@@ -6,8 +6,13 @@ package br.unibh.computacao.tclf.afd;
 
 /**
  *
- * @author FATORM_05
+ * @author RodrigoReis
  */
-public class Alfabeto {
-    
+public enum TokenType {
+    Unrecognized,
+    ID,
+    nreal,
+    nint,
+    nstring,
+    op
 }
