@@ -50,12 +50,4 @@ public class Alphabet extends ArrayList<String> {
         this.removeAll(this);
         this.addAll(java.util.Arrays.asList(a));
     }
-
-    /**
-     * Obtém um manipulador de iterações sobre o alfabeto.
-     * @return O Iterador.
-     */
-    public Iterator getIterator() {
-        return this.iterator();
-    }
 }
