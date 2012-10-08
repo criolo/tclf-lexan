@@ -40,68 +40,62 @@ public class Lexan {
                     } else if (letra.contains(caractere)) {
                         estado = 1;
                     } else if (digito.contains(caractere)) {
-                        estado = 3;
+                        estado = 2;
                     } else if (operador.contains(caractere)) {
-                        estado = 5;
+                        estado = 4;
                     } else if (caractere == '"') {
-                        estado = 6;
+                        estado = 5;
                     }
                     break;
+                // ID
                 case 1:
                     if (letra.contains(caractere) || digito.contains(caractere)) {
                         estado = 1;
                     } else {
-                        estado = 2;
+                        --i;
+                        System.out.print("ID ");
+                        estado = 0;
                     }
                     break;
+                // nint
                 case 2:
-                    System.out.print("ID ");
-                    //--i;
-                    estado = 0;
-                    break;
-                case 3:
-                    if (digito.contains(caractere)) {
+                    if (digito.contains(caractere)){
+                        estado = 2;
+                    }else if (caractere == '.'){
                         estado = 3;
-                    } else if (caractere == '.') {
-                        estado = 8;
-                    } else {
-                        estado = 4;
+                    }else {
+                        --i;
+                        System.out.print("nint ");
+                        estado = 0;
                     }
                     break;
-                case 4:
-                    System.out.print("nint ");
-                    //--i;
-                    estado = 0;
-                    break;
-                case 5:
-                    System.out.print("op ");
-                    //--i;
-                    estado = 0;
-                    break;
-                case 6:
-                    if (letra.contains(caractere) || digito.contains(caractere) || simbolo.contains(caractere)) {
-                        estado = 6;
-                    } else if (caractere == '"') {
-                        estado = 7;
-                    }
-                    break;
-                case 7:
-                    System.out.print("nstring ");
-                    //--i;
-                    estado = 0;
-                    break;
-                case 8:
-                    if (digito.contains(caractere)) {
-                        estado = 8;
+                // nreal
+                case 3:
+                    if (digito.contains(caractere)){
+                        estado = 3;
                     }else{
-                        estado = 9;
+                        --i;
+                        System.out.print("nreal ");
+                        estado = 0;
                     }
                     break;
-                case 9:
-                    System.out.print("nreal ");
-                    //--i;
+                // op
+                case 4:
+                    System.out.print("op ");
                     estado = 0;
                     break;
+                // nstring
+                case 5:
+                    if (letra.contains(caractere) 
+                            || digito.contains(caractere) 
+                            || simbolo.contains(caractere)
+                            || operador.contains(caractere)) {
+                        estado = 5;
+                    }else if (caractere == '"'){
+                        System.out.print("nstring ");
+                        estado = 0;
+                    }
+                    break;                
             }
         }
         System.out.println();
