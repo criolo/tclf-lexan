@@ -1,22 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.unibh.computacao.tclf.afd;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.Charset;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
+ * Manipulador de aqruivo.
  *
- * @author FATORM_05
+ * @author Rodrigo Reis (RA: 406204771)
  */
 public class Arquivo {
 
@@ -33,28 +26,33 @@ public class Arquivo {
      * @return
      */
     public static String texto(String nomeArquivo) {
-        try {
-            FileReader in = new FileReader(nomeArquivo);
-            BufferedReader reader = new BufferedReader(in);
-            StringBuilder buffer = new StringBuilder();
+        if (nomeArquivo != null || !nomeArquivo.equals("")) {
+            try {
+                FileReader in = new FileReader(nomeArquivo);
+                BufferedReader reader = new BufferedReader(in);
+                StringBuilder buffer = new StringBuilder();
 
-            int caractere;
-            while ((caractere = reader.read()) != -1) {
-                if (caractere != TAB && caractere != NOVA_LINHA && caractere != QUEBRA_LINHA) {
-                    char ch = (char) caractere;
-                    if (buffer.length() > 0) {
-                        int ultimoCaractere = (int) buffer.charAt(buffer.length() - 1);
-                        if (ultimoCaractere == ESPACO_BRANCO && caractere == ESPACO_BRANCO) {
-                            buffer.deleteCharAt(buffer.length() - 1);
+                int caractere;
+                while ((caractere = reader.read()) != -1) {
+                    if (caractere != TAB && caractere != NOVA_LINHA && caractere != QUEBRA_LINHA) {
+                        char ch = (char) caractere;
+                        if (buffer.length() > 0) {
+                            int ultimoCaractere = (int) buffer.charAt(buffer.length() - 1);
+                            if (ultimoCaractere == ESPACO_BRANCO && caractere == ESPACO_BRANCO) {
+                                buffer.deleteCharAt(buffer.length() - 1);
+                            }
                         }
+                        buffer.append(ch);
                     }
-                    buffer.append(ch);
                 }
-            }
-            return buffer.toString();
+                return buffer.toString();
 
-        } catch (Exception ex) {
-            System.out.printf("Error: %s", ex.getMessage());
+            } catch (Exception ex) {
+                System.out.printf("Error: %s", ex.getMessage());
+                return null;
+            }
+        }else{
+            System.out.println("Arquivo invalido.");
             return null;
         }
     }
@@ -68,9 +66,12 @@ public class Arquivo {
     public static void salvar(Path arquivo, String conteudo) {
         try {
             Files.deleteIfExists(arquivo);
-            Files.createFile(arquivo); 
-            BufferedWriter writer = Files.newBufferedWriter(arquivo, Charset.defaultCharset());
-            writer.write(conteudo, 0, conteudo.length());
+            Files.createFile(arquivo);
+            Files.write(arquivo, conteudo.getBytes());
+
+            System.out.println();
+            System.out.printf("O Arquivo %s foi salvo com sucesso.", arquivo.toString());
+            System.out.println();
         } catch (IOException ex) {
             System.err.format("IOException: %s%n", ex);
         }
