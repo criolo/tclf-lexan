@@ -3,8 +3,6 @@ package br.unibh.computacao.tclf.afd;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * AFD que reconhece os lexemas dos seguintes tokens: ID, nint, nreal, op,
