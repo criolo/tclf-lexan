@@ -1,13 +1,16 @@
 package br.unibh.computacao.tclf.afd;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * AFD que reconhece os lexemas dos seguintes tokens: ID, nint, nreal, op,
  * nstring.
  *
- * @author Rodrigo Reis
+ * @author Rodrigo Reis (RA: 406204771)
  */
 public class Afd {
 
@@ -137,8 +140,20 @@ public class Afd {
                     break;
             }
         }
-        System.out.println(conteudo);
-        Arquivo.salvar(Paths.get(this.caminho.getParent()
-                + "\\analise_" + this.caminho.getFileName()), conteudo);
+        conteudo = conteudo.trim();
+        System.out.println("OK..");
+        System.out.printf("Resultado: \"%s\"", conteudo);
+
+        if (this.caminho.getParent() == null) {
+            try {
+                String path = new java.io.File(".").getCanonicalPath();
+                Arquivo.salvar(Paths.get(path + "\\analise_" 
+                        + this.caminho.getFileName()), conteudo);
+            } catch (IOException ex) {
+            }            
+        } else {
+            Arquivo.salvar(Paths.get(this.caminho.getParent()
+                    + "\\analise_" + this.caminho.getFileName()), conteudo);
+        }
     }
 }

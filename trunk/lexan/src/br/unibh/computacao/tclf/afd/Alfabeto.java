@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Alfabeto.
  *
- * @author Rodrigo Reis
+ * @author Rodrigo Reis (RA: 406204771)
  */
 public class Alfabeto extends ArrayList<Character> {
 
