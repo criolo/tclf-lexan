@@ -54,7 +54,7 @@ public class Afd {
         this.estado = Estado.Inicial;
         this.letra = new Alfabeto("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
         this.digito = new Alfabeto("0123456789");
-        this.simbolo = new Alfabeto("'!@#$%¨&() ");
+        this.simbolo = new Alfabeto("'!@#$%¨&(),:>< ");
         this.operador = new Alfabeto("+-*/=");
     }
 
@@ -131,24 +131,13 @@ public class Afd {
     }
 
     /**
-     *
-     * @param caractere
-     * @return
-     */
-    public boolean outro(char caractere) {
-        return (!letra(caractere)
-                && !digito(caractere)
-                && !operador(caractere)
-                && !aspas(caractere));
-    }
-
-    /**
      * Inicia a analise léxica, e salva o resultado em um arquivo texto.
      */
     public void analisar() {
 
-        String conteudo = "";
+        String conteudo = "\n";
         String token = "";
+        String saida = "";
 
         for (int i = 0; i < this.texto.length(); ++i) {
 
@@ -157,13 +146,13 @@ public class Afd {
             switch (this.estado) {
                 case Inicial:
 
-                    if (outro(caractere)) {
+                    if (simbolo(caractere)) {
                         token = token + caractere;
                         this.estado = Estado.Inicial;
 
                     } else if (letra(caractere)) {
                         if (token.length() > 0) {
-                            conteudo = conteudo + "UNKNOW[" + token + "] ";
+                            conteudo = conteudo + "UNKNOW[" + token + "]\n";
                             token = "";
                         }
                         token = token + caractere;
@@ -171,7 +160,7 @@ public class Afd {
 
                     } else if (digito(caractere)) {
                         if (token.length() > 0) {
-                            conteudo = conteudo + "UNKNOW[" + token + "] ";
+                            conteudo = conteudo + "UNKNOW[" + token + "]\n";
                             token = "";
                         }
                         token = token + caractere;
@@ -179,7 +168,7 @@ public class Afd {
 
                     } else if (operador(caractere)) {
                         if (token.length() > 0) {
-                            conteudo = conteudo + "UNKNOW[" + token + "] ";
+                            conteudo = conteudo + "UNKNOW[" + token + "]\n";
                             token = "";
                         }
                         token = token + caractere;
@@ -187,7 +176,7 @@ public class Afd {
 
                     } else if (aspas(caractere)) {
                         if (token.length() > 0) {
-                            conteudo = conteudo + "UNKNOW[" + token + "] ";
+                            conteudo = conteudo + "UNKNOW[" + token + "]\n";
                             token = "";
                         }
                         token = token + caractere;
@@ -201,8 +190,9 @@ public class Afd {
                         token = token + caractere;
                         this.estado = Estado.ID;
                     } else {
-                        if (!outro(caractere)) {
-                            conteudo = conteudo + "ID[" + token + "] ";
+                        if (!simbolo(caractere)) {
+                            conteudo = conteudo + "ID[" + token + "]\n";
+                            saida = saida + "ID ";
                             token = "";
                         }
                         --i;
@@ -219,8 +209,9 @@ public class Afd {
                         token = token + caractere;
                         this.estado = Estado.nreal;
                     } else {
-                        if (!outro(caractere)) {
-                            conteudo = conteudo + "nint[" + token + "] ";
+                        if (!simbolo(caractere)) {
+                            conteudo = conteudo + "nint[" + token + "]\n";
+                            saida = saida + "nint ";
                             token = "";
                         }
                         --i;
@@ -234,8 +225,9 @@ public class Afd {
                         token = token + caractere;
                         this.estado = Estado.nreal;
                     } else {
-                        if (!outro(caractere)) {
-                            conteudo = conteudo + "nreal[" + token + "] ";
+                        if (!simbolo(caractere)) {
+                            conteudo = conteudo + "nreal[" + token + "]\n";
+                            saida = saida + "nreal ";
                             token = "";
                         }
                         --i;
@@ -245,7 +237,8 @@ public class Afd {
 
                 // op
                 case op:
-                    conteudo = conteudo + "op[" + token + "] ";
+                    conteudo = conteudo + "op[" + token + "]\n";
+                    saida = saida + "op ";
                     token = "";
                     --i;
                     this.estado = Estado.Inicial;
@@ -258,7 +251,8 @@ public class Afd {
                         this.estado = Estado.nstring;
                     } else if (caractere == '"') {
                         token = token + caractere;
-                        conteudo = conteudo + "nstring[" + token + "] ";
+                        conteudo = conteudo + "nstring[" + token + "]\n";
+                        saida = saida + "nstring ";
                         token = "";
                         //--i;
                         this.estado = Estado.Inicial;
@@ -268,23 +262,23 @@ public class Afd {
         }
         
         if (token.length() > 0) {
-            conteudo = conteudo + "UNKNOW[" + token + "] ";
+            conteudo = conteudo + "UNKNOW[" + token + "]\n";
         }
 
         conteudo = conteudo.trim();
-        System.out.println("OK..");
-        System.out.printf("Resultado: \"%s\"", conteudo);
+        saida = saida.trim();
+        System.out.printf("OK..Resultado:\n\n%s\n", conteudo);
 
         if (this.caminho.getParent() == null) {
             try {
                 String path = new java.io.File(".").getCanonicalPath();
                 Arquivo.salvar(Paths.get(path + "\\analise_"
-                        + this.caminho.getFileName()), conteudo);
+                        + this.caminho.getFileName()), saida);
             } catch (IOException ex) {
             }
         } else {
             Arquivo.salvar(Paths.get(this.caminho.getParent()
-                    + "\\analise_" + this.caminho.getFileName()), conteudo);
+                    + "\\analise_" + this.caminho.getFileName()), saida);
         }
     }
 }
