@@ -1,4 +1,4 @@
-package br.unibh.computacao.tclf.afd;
+package br.unibh.computacao.tclf;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,8 +19,8 @@ public class Arquivo {
     static final int ESPACO_BRANCO = 32;
 
     /**
-     * Obtém o texto contído no arquivo desconsiderando múltiplos espaços em
-     * branco e quebras de linha.
+     * Obtém o texto contído no arquivo desconsiderando espaços em branco,
+     * tabulações e quebras de linha.
      *
      * @param nomeArquivo
      * @return
@@ -34,15 +34,9 @@ public class Arquivo {
 
                 int caractere;
                 while ((caractere = reader.read()) != -1) {
-                    if (caractere != TAB && caractere != NOVA_LINHA && caractere != QUEBRA_LINHA) {
-                        char ch = (char) caractere;
-                        if (buffer.length() > 0) {
-                            int ultimoCaractere = (int) buffer.charAt(buffer.length() - 1);
-                            if (ultimoCaractere == ESPACO_BRANCO && caractere == ESPACO_BRANCO) {
-                                buffer.deleteCharAt(buffer.length() - 1);
-                            }
-                        }
-                        buffer.append(ch);
+                    if (caractere != TAB && caractere != NOVA_LINHA
+                            && caractere != QUEBRA_LINHA && caractere != ESPACO_BRANCO) {
+                        buffer.append((char) caractere);
                     }
                 }
                 return buffer.toString();
@@ -51,7 +45,7 @@ public class Arquivo {
                 System.out.printf("Error: %s", ex.getMessage());
                 return null;
             }
-        }else{
+        } else {
             System.out.println("Arquivo invalido.");
             return null;
         }

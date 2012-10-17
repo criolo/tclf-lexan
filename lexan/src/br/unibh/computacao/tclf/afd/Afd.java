@@ -1,5 +1,6 @@
 package br.unibh.computacao.tclf.afd;
 
+import br.unibh.computacao.tclf.Arquivo;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,8 +54,92 @@ public class Afd {
         this.estado = Estado.Inicial;
         this.letra = new Alfabeto("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
         this.digito = new Alfabeto("0123456789");
-        this.simbolo = new Alfabeto("'!@#$%¨&()");
+        this.simbolo = new Alfabeto("'!@#$%¨&() ");
         this.operador = new Alfabeto("+-*/=");
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean letra(char caractere) {
+        return letra.contains(caractere);
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean digito(char caractere) {
+        return digito.contains(caractere);
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean operador(char caractere) {
+        return operador.contains(caractere);
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean simbolo(char caractere) {
+        return simbolo.contains(caractere);
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean letraDigito(char caractere) {
+        return letra(caractere) || digito(caractere);
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean letraDigitoSimbolo(char caractere) {
+        return letra(caractere) || digito(caractere) || simbolo(caractere);
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean aspas(char caractere) {
+        return (caractere == '"');
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean ponto(char caractere) {
+        return (caractere == '.');
+    }
+
+    /**
+     *
+     * @param caractere
+     * @return
+     */
+    public boolean outro(char caractere) {
+        return (!letra(caractere)
+                && !digito(caractere)
+                && !operador(caractere)
+                && !aspas(caractere));
     }
 
     /**
@@ -63,6 +148,7 @@ public class Afd {
     public void analisar() {
 
         String conteudo = "";
+        String token = "";
 
         for (int i = 0; i < this.texto.length(); ++i) {
 
@@ -70,74 +156,121 @@ public class Afd {
 
             switch (this.estado) {
                 case Inicial:
-                    if (caractere == ' ') {
+
+                    if (outro(caractere)) {
+                        token = token + caractere;
                         this.estado = Estado.Inicial;
-                    } else if (letra.contains(caractere)) {
+
+                    } else if (letra(caractere)) {
+                        if (token.length() > 0) {
+                            conteudo = conteudo + "UNKNOW[" + token + "] ";
+                            token = "";
+                        }
+                        token = token + caractere;
                         this.estado = Estado.ID;
-                    } else if (digito.contains(caractere)) {
+
+                    } else if (digito(caractere)) {
+                        if (token.length() > 0) {
+                            conteudo = conteudo + "UNKNOW[" + token + "] ";
+                            token = "";
+                        }
+                        token = token + caractere;
                         this.estado = Estado.nint;
-                    } else if (operador.contains(caractere)) {
+
+                    } else if (operador(caractere)) {
+                        if (token.length() > 0) {
+                            conteudo = conteudo + "UNKNOW[" + token + "] ";
+                            token = "";
+                        }
+                        token = token + caractere;
                         this.estado = Estado.op;
-                    } else if (caractere == '"') {
+
+                    } else if (aspas(caractere)) {
+                        if (token.length() > 0) {
+                            conteudo = conteudo + "UNKNOW[" + token + "] ";
+                            token = "";
+                        }
+                        token = token + caractere;
                         this.estado = Estado.nstring;
                     }
                     break;
+
                 // ID
                 case ID:
-                    if (letra.contains(caractere) || digito.contains(caractere)) {
+                    if (letraDigito(caractere)) {
+                        token = token + caractere;
                         this.estado = Estado.ID;
                     } else {
+                        if (!outro(caractere)) {
+                            conteudo = conteudo + "ID[" + token + "] ";
+                            token = "";
+                        }
                         --i;
-                        //System.out.print("ID ");
-                        conteudo = conteudo + "ID ";
                         this.estado = Estado.Inicial;
                     }
                     break;
+
                 // nint
                 case nint:
-                    if (digito.contains(caractere)) {
+                    if (digito(caractere)) {
+                        token = token + caractere;
                         this.estado = Estado.nint;
-                    } else if (caractere == '.') {
+                    } else if (ponto(caractere)) {
+                        token = token + caractere;
                         this.estado = Estado.nreal;
                     } else {
+                        if (!outro(caractere)) {
+                            conteudo = conteudo + "nint[" + token + "] ";
+                            token = "";
+                        }
                         --i;
-                        //System.out.print("nint ");
-                        conteudo = conteudo + "nint ";
                         this.estado = Estado.Inicial;
                     }
                     break;
+
                 // nreal
                 case nreal:
-                    if (digito.contains(caractere)) {
+                    if (digito(caractere)) {
+                        token = token + caractere;
                         this.estado = Estado.nreal;
                     } else {
+                        if (!outro(caractere)) {
+                            conteudo = conteudo + "nreal[" + token + "] ";
+                            token = "";
+                        }
                         --i;
-                        //System.out.print("nreal ");
-                        conteudo = conteudo + "nreal ";
                         this.estado = Estado.Inicial;
                     }
                     break;
+
                 // op
                 case op:
-                    //System.out.print("op ");
-                    conteudo = conteudo + "op ";
+                    conteudo = conteudo + "op[" + token + "] ";
+                    token = "";
+                    --i;
                     this.estado = Estado.Inicial;
                     break;
+
                 // nstring
                 case nstring:
-                    if (letra.contains(caractere)
-                            || digito.contains(caractere)
-                            || simbolo.contains(caractere)
-                            || operador.contains(caractere)) {
+                    if (letraDigitoSimbolo(caractere)) {
+                        token = token + caractere;
                         this.estado = Estado.nstring;
                     } else if (caractere == '"') {
-                        //System.out.print("nstring ");
-                        conteudo = conteudo + "nstring ";
+                        token = token + caractere;
+                        conteudo = conteudo + "nstring[" + token + "] ";
+                        token = "";
+                        //--i;
                         this.estado = Estado.Inicial;
                     }
                     break;
             }
         }
+        
+        if (token.length() > 0) {
+            conteudo = conteudo + "UNKNOW[" + token + "] ";
+        }
+
         conteudo = conteudo.trim();
         System.out.println("OK..");
         System.out.printf("Resultado: \"%s\"", conteudo);
@@ -145,10 +278,10 @@ public class Afd {
         if (this.caminho.getParent() == null) {
             try {
                 String path = new java.io.File(".").getCanonicalPath();
-                Arquivo.salvar(Paths.get(path + "\\analise_" 
+                Arquivo.salvar(Paths.get(path + "\\analise_"
                         + this.caminho.getFileName()), conteudo);
             } catch (IOException ex) {
-            }            
+            }
         } else {
             Arquivo.salvar(Paths.get(this.caminho.getParent()
                     + "\\analise_" + this.caminho.getFileName()), conteudo);
